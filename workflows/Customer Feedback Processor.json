@@ -1,0 +1,616 @@
+{
+  "name": "Customer Feedback Processor",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "rating"
+            },
+            {
+              "name": "email"
+            },
+            {
+              "name": "message"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "source"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        -64
+      ],
+      "id": "1e32a0cd-dc47-4950-a280-1b69b27d1fa8",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a Customer Feedback Analyst. Analyze customer feedback and draft appropriate customer responses.\n\n## Input\n- Rating: {{ $json.rating }}\n- Message: {{ $json.message }}\n\n## Rules\n\n1. **Missing message:** If the message is empty, missing, or whitespace only, do not analyze sentiment or infer reasons from the rating. Return `Not Analyzed`, categories `[\"None\"]`, priority `None`, and key_issue `None`. State that no written comment was provided and recommend recording the rating without inferring satisfaction.\n\n2. **Sentiment:** When a message exists, classify sentiment as `Positive`, `Neutral`, or `Negative`, considering both the rating (1–2 negative, 3 neutral, 4–5 positive) and the message. Account for contradictions.\n\n3. **Categories:** Choose only supported categories: `Food/Product Quality`, `Customer Service`, `Waiting Time`, `Cleanliness`, `Price/Value`, `Staff Behavior`, `Overall Experience`, `Other`, or `None`. Never infer specific issues from ratings alone.\n\n4. **Priority:** Use `High` for potentially serious issues requiring prompt investigation, such as safety hazards, suspected contamination, threats, or serious misconduct. Use `Medium` for specific problems requiring investigation, `Low` for minor concerns or routine feedback, and `None` when no message is provided. Treat allegations as unverified.\n\n5. **Customer Response:** Draft a concise, professional, empathetic response that acknowledges the customer's actual feedback. For complaints, apologize for the reported experience without claiming that an investigation or corrective action has already occurred. For positive feedback, thank the customer. For neutral feedback, acknowledge their comments appropriately. Do not invent facts, promises, compensation, or outcomes.\n\n6. **Rating-only submissions:** If no message is provided, set `customer_response` to `None`.\n\n7. **Output:** Return only the structured JSON required by the output parser. Include `sentiment`, `categories`, `summary`, `key_issue`, `recommended_action`, `priority`, and `customer_response`. Follow all allowed values exactly. Be concise and factual.",
+        "hasOutputParser": true,
+        "needsFallback": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        144,
+        -64
+      ],
+      "id": "62cc3209-0666-41ef-9e13-ea5c06165ccc",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "qwen/qwen3-4b-2507",
+          "mode": "list",
+          "cachedResultName": "qwen/qwen3-4b-2507"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        144,
+        176
+      ],
+      "id": "ec7d39ec-282b-4512-b271-6cbc0f5b884b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "EIab2ExnQ4AwaIIn",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"sentiment\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"Positive\",\n        \"Neutral\",\n        \"Negative\",\n        \"Not Analyzed\"\n      ]\n    },\n    \"categories\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\",\n        \"enum\": [\n          \"Food/Product Quality\",\n          \"Customer Service\",\n          \"Waiting Time\",\n          \"Cleanliness\",\n          \"Price/Value\",\n          \"Staff Behavior\",\n          \"Overall Experience\",\n          \"Other\",\n          \"None\"\n        ]\n      }\n    },\n    \"summary\": {\n      \"type\": \"string\"\n    },\n    \"key_issue\": {\n      \"type\": \"string\"\n    },\n    \"recommended_action\": {\n      \"type\": \"string\"\n    },\n    \"priority\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"High\",\n        \"Medium\",\n        \"Low\",\n        \"None\"\n      ]\n    },\n    \"customer_response\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"sentiment\",\n    \"categories\",\n    \"summary\",\n    \"key_issue\",\n    \"recommended_action\",\n    \"priority\",\n    \"customer_response\"\n  ],\n  \"additionalProperties\": false\n}\n",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        176
+      ],
+      "id": "80a3f900-37a4-4a2c-8175-f42d2d136fc2",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1CBaU26W7-b4U1l7GYyKwEp0i41OsTCV1c1nfByfEe7E",
+          "mode": "list",
+          "cachedResultName": "Reviews",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CBaU26W7-b4U1l7GYyKwEp0i41OsTCV1c1nfByfEe7E/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CBaU26W7-b4U1l7GYyKwEp0i41OsTCV1c1nfByfEe7E/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Submitted at": "={{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}",
+            "Rating": "={{ $('When Executed by Another Workflow').item.json.rating }}",
+            "Email": "={{ $('When Executed by Another Workflow').item.json.email }}",
+            "Name": "={{ $('When Executed by Another Workflow').item.json.name }}",
+            "Source": "={{ $('When Executed by Another Workflow').item.json.source }}",
+            "Message": "={{ $('When Executed by Another Workflow').item.json.message }}",
+            "Sentiment": "={{ $json.output.sentiment }}",
+            "Categories": "={{ $json.output.categories }}",
+            "Summary": "={{ $json.output.summary }}",
+            "Key Issue": "={{ $json.output.key_issue }}",
+            "Recommended Action": "={{ $json.output.recommended_action }}",
+            "Priority": "={{ $json.output.priority }}",
+            "Sent Response": "={{ $('When Executed by Another Workflow').item.json.email ? $json.output.customer_response : '' }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Submitted at",
+              "displayName": "Submitted at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Rating",
+              "displayName": "Rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sentiment",
+              "displayName": "Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Categories",
+              "displayName": "Categories",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Key Issue",
+              "displayName": "Key Issue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Recommended Action",
+              "displayName": "Recommended Action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sent Response",
+              "displayName": "Sent Response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        -64
+      ],
+      "id": "42179bdf-29f9-4a5e-b4b7-3f107624637e",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ugSb1vS4QHz3FCZj",
+          "name": "jphilip dev"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "nvidia/nemotron-3.5-lightning:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        304,
+        384
+      ],
+      "id": "ce967ff3-70eb-4514-8515-f1fb6e7eb367",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "XtvOt2oDtX47ZZSI",
+          "name": "free_only"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "cf4a05ec-ef15-43ff-86cf-68d3b9989bab",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        896,
+        -64
+      ],
+      "id": "4c2b2282-8393-4bb1-8118-6b9053ec19c6",
+      "name": "Email provided?"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        32
+      ],
+      "id": "1f0961ce-a33e-44f6-a3f7-f5669e2d6d1e",
+      "name": "Do nothing"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "c30e5ff9-a9b4-4986-8cd8-e14fdd8ca476",
+              "leftValue": "={{ $('Basic LLM Chain').item.json.output.priority }}",
+              "rightValue": "High",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        1344,
+        -64
+      ],
+      "id": "4f201e7c-ad6d-4c57-9997-341b843b3d4e",
+      "name": "High Prio?"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        32
+      ],
+      "id": "15e5a94b-d0a9-4a28-9ac9-ba2786bfd928",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        -64
+      ],
+      "id": "7d004169-4e01-44f8-a528-ec7fa15b5878",
+      "name": "End"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('When Executed by Another Workflow').item.json.email }}",
+        "subject": "Customer Feedback Response",
+        "emailType": "text",
+        "message": "=Hello,\n\n{{ $('Basic LLM Chain').item.json.output.customer_response }}\n\nBest regards,\nTeam",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        -160
+      ],
+      "id": "f1f3ef18-9537-43df-8d0f-b813babb933e",
+      "name": "Send a message to reviewer",
+      "webhookId": "7658e4d1-8a05-4a38-987c-890e8f05e658",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "JTaQkmegtUxdvI3Q",
+          "name": "jphilip dev"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('When Executed by Another Workflow').item.json.email }}",
+        "subject": "Customer Feedback Response",
+        "emailType": "text",
+        "message": "=Hello,\n\n{{ $('Basic LLM Chain').item.json.output.customer_response }}\n\nBest regards,\nTeam",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1568,
+        -160
+      ],
+      "id": "dada0010-74cc-4e51-9f73-c8fe7eb50710",
+      "name": "Notify Business",
+      "webhookId": "7658e4d1-8a05-4a38-987c-890e8f05e658",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "JTaQkmegtUxdvI3Q",
+          "name": "jphilip dev"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Email provided?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Email provided?": {
+      "main": [
+        [
+          {
+            "node": "Send a message to reviewer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Do nothing": {
+      "main": [
+        [
+          {
+            "node": "High Prio?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Prio?": {
+      "main": [
+        [
+          {
+            "node": "Notify Business",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message to reviewer": {
+      "main": [
+        [
+          {
+            "node": "High Prio?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Business": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9403b97c-cdd5-4b4b-a9b3-269a3e9d5364",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2946da10cb32e17d3b3d7a3c04192a077fcba729acc5f6701353d5a127ca434e"
+  },
+  "nodeGroups": [],
+  "id": "14iKCAZYJvo6CRtn",
+  "tags": []
+}

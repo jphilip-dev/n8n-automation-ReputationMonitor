@@ -1,0 +1,530 @@
+{
+  "name": "Custom Feedback Form",
+  "nodes": [
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n  <title>{{ $('Form Configuration').item.json.Title }}</title>\n  <style>\n    :root {\n      --bg: {{ $json.bg }};\n      --card: {{ $json.card }};\n      --text: {{ $json.text }};\n      --muted: {{ $json.muted }};\n      --accent: {{ $json.accent }};\n      --accent-contrast: {{ $json[\"accent-contrast\"] }};\n      --border: {{ $json.border }};\n      --star: {{ $json.star }};\n      --star-active: {{ $json[\"star-active\"] }};\n      --focus: {{ $json.focus }};\n      --radius: {{ $json.radius }};\n      --shadow: {{ $json.shadow }};\n      --maxw: {{ $json.maxw }};\n      --star-size: {{ $json[\"star-size\"] }};\n    }\n\n    * { box-sizing: border-box; }\n    html, body { height: 100%; }\n    body {\n      margin: 0;\n      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, \"Apple Color Emoji\", \"Segoe UI Emoji\";\n      background: var(--bg);\n      color: var(--text);\n      display: grid;\n      place-items: center;\n      padding: 24px;\n    }\n\n    .card {\n      width: 100%;\n      max-width: var(--maxw);\n      background: var(--card);\n      border: 1px solid var(--border);\n      border-radius: var(--radius);\n      box-shadow: var(--shadow);\n      padding: 24px;\n    }\n\n    h1 { font-size: 1.25rem; margin: 0 0 4px; }\n    .sub { color: var(--muted); margin: 0 0 18px; font-size: 0.95rem; }\n\n    form { display: grid; gap: 18px; }\n    .field { display: grid; gap: 10px; }\n    label.top { font-weight: 600; }\n\n    .stars {\n      display: flex;\n      flex-direction: row-reverse;\n      justify-content: flex-end;\n      gap: 6px;\n    }\n\n    .stars input {\n      position: absolute;\n      inline-size: 1px;\n      block-size: 1px;\n      margin: -1px;\n      padding: 0;\n      border: 0;\n      clip: rect(0 0 0 0);\n      clip-path: inset(50%);\n      overflow: hidden;\n      white-space: nowrap;\n    }\n\n    .stars label {\n      cursor: pointer;\n      font-size: var(--star-size);\n      line-height: 1;\n      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.05));\n    }\n\n    .stars label span { color: var(--star); transition: color 150ms ease; }\n    .stars label:hover span,\n    .stars label:hover ~ label span { color: var(--star-active); }\n    .stars input:checked ~ label span { color: var(--star-active); }\n\n    \n    input[type=\"email\"] {\n      width: 100%;\n      padding: 12px 14px;\n      border-radius: 12px;\n      border: 1px solid var(--border);\n      background: #ffffff;\n      color: #1f2937;\n      font: inherit;\n    }\n    \n    input[type=\"email\"]:focus {\n      outline: none;\n      box-shadow: var(--focus);\n      border-color: var(--accent);\n    }\n    \n    input[type=\"email\"]::placeholder,\n    textarea::placeholder {\n      color: #6b7280;\n      opacity: 1;\n    }\n    \n    textarea {\n      width: 100%;\n      min-height: 110px;\n      resize: vertical;\n      padding: 12px 14px;\n      border-radius: 12px;\n      border: 1px solid var(--border);\n      background: #ffffff;\n      color: #1f2937;\n      font: inherit;\n    }\n    \n    textarea:focus {\n      outline: none;\n      box-shadow: var(--focus);\n      border-color: var(--accent);\n    }\n    \n    \n\n    .actions { display: flex; gap: 12px; justify-content: flex-end; }\n\n    button {\n      appearance: none;\n      border: 1px solid var(--accent);\n      background: var(--accent);\n      color: var(--accent-contrast);\n      padding: 10px 16px;\n      border-radius: 12px;\n      font-weight: 600;\n      cursor: pointer;\n      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);\n    }\n\n    .muted-btn { background: transparent; color: var(--text); border-color: var(--border); box-shadow: none; }\n  </style>\n</head>\n<body>\n  <main class=\"card\" aria-labelledby=\"title\">\n    <h1 id=\"title\">{{ $('Form Configuration').item.json.Header }}</h1>\n    <p class=\"sub\">{{ $('Form Configuration').item.json.Description }}</p>\n\n    <form action=\"{{ $('Form Configuration').item.json.PostFeedbackLink }}{{ $('Form Configuration').item.json.queryParams }}\" method=\"POST\">\n      <div class=\"field\">\n        <label class=\"top\" for=\"rating-1\">Star rating <span aria-hidden=\"true\">*</span></label>\n        <div class=\"stars\" role=\"radiogroup\" aria-label=\"Star rating from 1 to 5\">\n          <input type=\"radio\" name=\"rating\" id=\"rating-5\" value=\"5\" required>\n          <label for=\"rating-5\" title=\"5 stars\"><span>★</span></label>\n\n          <input type=\"radio\" name=\"rating\" id=\"rating-4\" value=\"4\" required>\n          <label for=\"rating-4\" title=\"4 stars\"><span>★</span></label>\n\n          <input type=\"radio\" name=\"rating\" id=\"rating-3\" value=\"3\" required>\n          <label for=\"rating-3\" title=\"3 stars\"><span>★</span></label>\n\n          <input type=\"radio\" name=\"rating\" id=\"rating-2\" value=\"2\" required>\n          <label for=\"rating-2\" title=\"2 stars\"><span>★</span></label>\n\n          <input type=\"radio\" name=\"rating\" id=\"rating-1\" value=\"1\" required>\n          <label for=\"rating-1\" title=\"1 star\"><span>★</span></label>\n        </div>\n      </div>\n\n      \n      <div class=\"field\">\n        <label class=\"top\" for=\"email\">Email (optional)</label>\n        <input\n          type=\"email\"\n          id=\"email\"\n          name=\"email\"\n          placeholder=\"you@example.com\"\n          autocomplete=\"email\"\n        >\n      </div>\n\n\n      <div class=\"field\">\n        <label class=\"top\" for=\"message\">Message (optional)</label>\n        <textarea id=\"message\" name=\"message\" placeholder=\"Tell us a bit more…\"></textarea>\n      </div>\n\n      <div class=\"actions\">\n        <button type=\"reset\" class=\"muted-btn\">{{ $('Form Configuration').item.json.ClearBtn }}</button>\n        <button type=\"submit\">{{ $('Form Configuration').item.json.SubmitBtn }}</button>\n      </div>\n    </form>\n  </main>\n</body>\n</html>"
+      },
+      "id": "e28589f0-fdfa-475f-a487-25ab3fdbf91f",
+      "name": "Feedback Input HTML",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        912,
+        32
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eb90800e-3fba-4f93-9058-3b663d6d92b1",
+              "name": "Title",
+              "type": "string",
+              "value": "Simple Feedback Input"
+            },
+            {
+              "id": "9b12be64-eca5-46b0-be34-a2760c03d356",
+              "name": "Header",
+              "type": "string",
+              "value": "Rate your experience"
+            },
+            {
+              "id": "230249b4-6431-455c-94fa-640720e4eb77",
+              "name": "Description",
+              "type": "string",
+              "value": "Your rating helps us improve. Stars are required; message is optional."
+            },
+            {
+              "id": "5c4f7ad0-b1dd-4eb5-9795-42b1051fa57e",
+              "name": "ClearBtn",
+              "type": "string",
+              "value": "Clear"
+            },
+            {
+              "id": "be71a869-305f-4039-a5aa-1d6f03fc50db",
+              "name": "SubmitBtn",
+              "type": "string",
+              "value": "Submit feedback"
+            },
+            {
+              "id": "d5b8e79b-fd2c-4cc5-9885-7259ee700477",
+              "name": "PostFeedbackLink",
+              "type": "string",
+              "value": "https://n8n.automationabc.com/webhook/feedback"
+            },
+            {
+              "id": "4da8b6ef-efac-40d3-bdae-d06215fea967",
+              "name": "queryParams",
+              "type": "string",
+              "value": "={{ $json.query && Object.keys($json.query).length\n  ? '?' + Object.keys($json.query)\n      .filter(k => $json.query[k] !== undefined && $json.query[k] !== null && $json.query[k] !== '')\n      .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(String($json.query[k])))\n      .join('&')\n  : ''\n}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4526acf6-d7d0-4698-8ad8-a66fa19a736f",
+      "name": "Form Configuration",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        464,
+        32
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "feedback",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "3dce1f8e-c867-41e6-8188-0632b643a0e2",
+      "name": "Post Feedback",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        176,
+        128
+      ],
+      "webhookId": "8bd03ec6-8f63-4ee7-af17-30d38a588a46",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "path": "feedback",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ef50eeb0-f494-45a1-97c5-835c5a23d4fd",
+      "name": "Input Feedback",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        176,
+        -96
+      ],
+      "webhookId": "a547fa07-1fe4-4769-a83e-3f5f549771c4",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "40ca52c0-1258-4e59-aaa8-dd933d165c88",
+              "name": "Title",
+              "type": "string",
+              "value": "Thank You for Your Feedback"
+            },
+            {
+              "id": "94332494-7637-4df4-9281-e31fec3972ff",
+              "name": "Header",
+              "type": "string",
+              "value": "Thank You!"
+            },
+            {
+              "id": "82d691be-165a-44ef-be1b-8139e5a08eba",
+              "name": "Description",
+              "type": "string",
+              "value": "We appreciate your feedback — it helps us improve our service."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7950aa25-e1b1-41b6-93e8-4f581fb3188e",
+      "name": "Page Configuration",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        912,
+        256
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "\n{\n  \"bg\": \"#0f172a\",\n  \"card\": \"#1e293b\",\n  \"text\": \"#f1f5f9\",\n  \"muted\": \"#94a3b8\",\n  \"accent\": \"#14b8a6\",\n  \"accent-contrast\": \"#042f2e\",\n  \"border\": \"#334155\",\n  \"star\": \"#475569\",\n  \"star-active\": \"#fbbf24\",\n  \"focus\": \"0 0 0 4px rgba(20, 184, 166, 0.25)\",\n  \"radius\": \"16px\",\n  \"shadow\": \"0 10px 25px rgba(0, 0, 0, 0.25), 0 4px 10px rgba(0, 0, 0, 0.15)\",\n  \"maxw\": \"560px\",\n  \"star-size\": \"28px\"\n}\n",
+        "options": {}
+      },
+      "id": "24a2f4aa-88cd-449b-bbf1-46725a890deb",
+      "name": "Theme Configuration - Feedback Input",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        688,
+        32
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n  <title>Thank You for Your Feedback</title>\n  <style>\n    :root {\n      --bg: {{ $json.bg }};\n      --card: {{ $json.card }};\n      --muted: {{ $json.muted }};\n      --border: {{ $json.border }};\n      --radius: {{ $json.radius }};\n      --shadow: {{ $json.shadow }};\n      --maxw: {{ $json.maxw }};\n    }\n\n    * { box-sizing: border-box; }\n    html, body { height: 100%; }\n\n    body {\n      margin: 0;\n      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial;\n      background: var(--bg);\n      color: var(--text);\n      display: grid;\n      place-items: center;\n      padding: 24px;\n    }\n\n    .card {\n      width: 100%;\n      max-width: var(--maxw);\n      background: var(--card);\n      border: 1px solid var(--border);\n      border-radius: var(--radius);\n      box-shadow: var(--shadow);\n      padding: 40px 28px;\n      text-align: center;\n    }\n\n    h1 {\n      font-size: 1.6rem;\n      color: #ffffff;\n    }\n\n    p.sub {\n      color: var(--muted);\n      font-size: 1rem;\n    }\n  </style>\n</head>\n<body>\n  <main class=\"card\">\n    <h1>Thank You!</h1>\n    <p class=\"sub\">We appreciate your feedback — it helps us improve our service.</p>\n  </main>\n</body>\n</html>"
+      },
+      "id": "ef22e79d-36e1-43cc-8983-8916d2c21aff",
+      "name": "Feedback Submitted HTML",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        1360,
+        256
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"bg\": \"#0f172a\",\n  \"card\": \"#1e293b\",\n  \"muted\": \"#94a3b8\",\n  \"border\": \"#334155\",\n  \"radius\": \"16px\",\n  \"shadow\": \"0 10px 25px rgba(0, 0, 0, 0.25), 0 4px 10px rgba(0, 0, 0, 0.15)\",\n  \"maxw\": \"560px\"\n}",
+        "options": {}
+      },
+      "id": "5742dfdc-3cc6-4f2c-9860-0df390b79beb",
+      "name": "Theme Configuration - Feedback Submitted",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1136,
+        256
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "c286dc0a-6d6a-4dc8-aa75-0b17ebd95dd2",
+      "name": "Respond with Feedback Submitted",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        1376,
+        128
+      ],
+      "typeVersion": 1.4
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "75a040ac-a715-40a4-946e-d59c5791ea3f",
+      "name": "Respond with Feedback Input",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        928,
+        -96
+      ],
+      "typeVersion": 1.4
+    },
+    {
+      "parameters": {
+        "content": "### Form can send additional info using url params\nsample: ?business=ABC%20Cafe&source=google",
+        "height": 80,
+        "width": 384,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        176,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "c23f8d46-24db-43ca-96af-0d1688e03c8b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "14iKCAZYJvo6CRtn",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/14iKCAZYJvo6CRtn",
+          "cachedResultName": "Process Review"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "rating": "={{ $json.body.rating }}",
+            "email": "={{ $json.body.email }}",
+            "message": "={{ $json.body.message }}",
+            "name": "N/A",
+            "source": "direct_feedback"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "rating",
+              "displayName": "rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        624,
+        128
+      ],
+      "id": "f732c316-ef6a-41d9-8401-1153b5919e63",
+      "name": "Process Review"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "8ZsAYzIqd2SNlgkM",
+          "mode": "list",
+          "cachedResultName": "002 - ReputationMonitor - Feedbacks",
+          "cachedResultUrl": "/projects/En3F3NfSHlWOgY0Y/datatables/8ZsAYzIqd2SNlgkM"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "rating": "={{ $json.body.rating }}",
+            "email": "={{ $json.body.email }}",
+            "message": "={{ $json.body.message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "rating",
+              "displayName": "rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        128
+      ],
+      "id": "e813e081-1fd0-4ffd-9243-b8c2e3e31e59",
+      "name": "Insert Backup to Data Table"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Feedback Input HTML": {
+      "main": [
+        [
+          {
+            "node": "Respond with Feedback Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form Configuration": {
+      "main": [
+        [
+          {
+            "node": "Theme Configuration - Feedback Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Feedback": {
+      "main": [
+        [
+          {
+            "node": "Insert Backup to Data Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input Feedback": {
+      "main": [
+        [
+          {
+            "node": "Form Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Page Configuration": {
+      "main": [
+        [
+          {
+            "node": "Theme Configuration - Feedback Submitted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Theme Configuration - Feedback Input": {
+      "main": [
+        [
+          {
+            "node": "Feedback Input HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feedback Submitted HTML": {
+      "main": [
+        [
+          {
+            "node": "Respond with Feedback Submitted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Theme Configuration - Feedback Submitted": {
+      "main": [
+        [
+          {
+            "node": "Feedback Submitted HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Review": {
+      "main": [
+        [
+          {
+            "node": "Page Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Backup to Data Table": {
+      "main": [
+        [
+          {
+            "node": "Process Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1c004a61-38ba-4011-83bd-6ac5f43c11b1",
+  "meta": {
+    "instanceId": "2946da10cb32e17d3b3d7a3c04192a077fcba729acc5f6701353d5a127ca434e"
+  },
+  "nodeGroups": [
+    {
+      "id": "32f38a27-182b-4e05-b465-6d8f782a1c1d",
+      "name": "Custom Thank you page",
+      "nodeIds": [
+        "7950aa25-e1b1-41b6-93e8-4f581fb3188e",
+        "ef22e79d-36e1-43cc-8983-8916d2c21aff",
+        "5742dfdc-3cc6-4f2c-9860-0df390b79beb"
+      ],
+      "description": "Html configs of the end page"
+    },
+    {
+      "id": "59992cd7-465d-4d53-b0e0-ef63ecc4348c",
+      "name": "Custom Input Form Page",
+      "nodeIds": [
+        "e28589f0-fdfa-475f-a487-25ab3fdbf91f",
+        "4526acf6-d7d0-4698-8ad8-a66fa19a736f",
+        "24a2f4aa-88cd-449b-bbf1-46725a890deb"
+      ],
+      "description": "Html configs for the form"
+    }
+  ],
+  "id": "aBXy5qkvF81t13Qr",
+  "tags": []
+}

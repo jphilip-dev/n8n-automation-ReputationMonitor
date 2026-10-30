@@ -1,0 +1,1027 @@
+{
+  "name": "Google Map Reviews Collector",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -512,
+        -80
+      ],
+      "id": "fefea589-1a07-4415-9bd8-e8979e487d9e",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "H6jT46tl9s0FdWKu",
+          "mode": "list",
+          "cachedResultName": "Shared Variables",
+          "cachedResultUrl": "/projects/En3F3NfSHlWOgY0Y/datatables/H6jT46tl9s0FdWKu"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "key",
+              "keyValue": "apify_last_used_date"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -64,
+        -80
+      ],
+      "id": "6c01c1bf-61b9-4b06-a882-b676de8b2f4a",
+      "name": "Get Apify Last Used Date"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "72d099b7-eab1-4eb4-9f4d-7f0658c268aa",
+              "name": "count",
+              "value": "={{ $(\"Increment count of reviews to get\").isExecuted ? $json.new_count: 3 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        160,
+        -80
+      ],
+      "id": "d6d29f36-16d1-4df2-a117-93ccda9a5036",
+      "name": "Count of reviews to Get"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "864e6ecd-f855-4d2c-80d3-7afbd4275f57",
+              "name": "google_map_place_url",
+              "value": "https://www.google.com/maps/place/Jollibee+Iligan+Tibanga+DT/@8.232953,124.2362174,13.92z/data=!4m6!3m5!1s0x325577529c45ce7d:0xd4bf628de05a1568!8m2!3d8.2381442!4d124.243925!16s%2Fg%2F1tfjhnh6?hl=en-GB&entry=ttu&g_ep=EgoyMDI2MTAyNy4wIKXMDSoASAFQAw%3D%3D",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -288,
+        -80
+      ],
+      "id": "f45f0368-9168-4de8-a7e9-bed202f4ea8e",
+      "name": "Google Map Place URL"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1a51ce0f-5ff1-49e5-9679-b5e7947a9969",
+              "name": "new_count",
+              "value": "={{  $('Count reviews from Apify').item.json.itemCount+ 10}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1056,
+        16
+      ],
+      "id": "b8d2c8e3-2aa7-4575-97f2-15e92893339f",
+      "name": "Increment count of reviews to get"
+    },
+    {
+      "parameters": {
+        "operation": "Run actor and get dataset",
+        "actorId": {
+          "__rl": true,
+          "value": "Xb8osYTtOjlsgI6k9",
+          "mode": "list",
+          "cachedResultName": "Google Maps Reviews Scraper (compass/Google-Maps-Reviews-Scraper)",
+          "cachedResultUrl": "https://console.apify.com/actors/Xb8osYTtOjlsgI6k9/input"
+        },
+        "actorInputMode": "schema",
+        "actorInput": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "startUrls": "=[\n  {\n    \"url\": \"{{ $('Google Map Place URL').item.json.google_map_place_url }}\"\n  }\n] ",
+            "maxReviews": "={{ $json.count }}",
+            "language": "en",
+            "reviewsSort": "newest",
+            "reviewsStartDate": "={{ $('Get Apify Last Used Date').item.json.value }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "startUrls",
+              "displayName": "Google Maps place URLs",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "array",
+              "removed": false,
+              "defaultValue": "[\n  {\n    \"url\": \"https://www.google.com/maps/place/Yellowstone+National+Park/@44.5857951,-110.5140571,9z/data=!3m1!4b1!4m5!3m4!1s0x5351e55555555555:0xaca8f930348fe1bb!8m2!3d44.427963!4d-110.588455?hl=en-GB\"\n  }\n]"
+            },
+            {
+              "id": "placeIds",
+              "displayName": "🗃 Place IDs",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "array",
+              "removed": true
+            },
+            {
+              "id": "maxReviews",
+              "displayName": "Number of reviews",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "number",
+              "removed": false,
+              "defaultValue": 100
+            },
+            {
+              "id": "reviewsSort",
+              "displayName": "Sort reviews by",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "options",
+              "removed": false,
+              "options": [
+                {
+                  "name": "Newest",
+                  "value": "newest"
+                },
+                {
+                  "name": "Most relevant",
+                  "value": "mostRelevant"
+                },
+                {
+                  "name": "Highest ranking",
+                  "value": "highestRanking"
+                },
+                {
+                  "name": "Lowest ranking",
+                  "value": "lowestRanking"
+                }
+              ]
+            },
+            {
+              "id": "reviewsStartDate",
+              "displayName": "Only scrape reviews newer than [date]",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "reviewsFilterString",
+              "displayName": "Filter reviews by keywords",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "language",
+              "displayName": "Language",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "options",
+              "removed": false,
+              "options": [
+                {
+                  "name": "English",
+                  "value": "en"
+                },
+                {
+                  "name": "Afrikaans",
+                  "value": "af"
+                },
+                {
+                  "name": "azərbaycan",
+                  "value": "az"
+                },
+                {
+                  "name": "BahasaIndonesia",
+                  "value": "id"
+                },
+                {
+                  "name": "BahasaMelayu",
+                  "value": "ms"
+                },
+                {
+                  "name": "bosanski",
+                  "value": "bs"
+                },
+                {
+                  "name": "català",
+                  "value": "ca"
+                },
+                {
+                  "name": "Čeština",
+                  "value": "cs"
+                },
+                {
+                  "name": "Dansk",
+                  "value": "da"
+                },
+                {
+                  "name": "Deutsch (Deutschland)",
+                  "value": "de"
+                },
+                {
+                  "name": "eesti",
+                  "value": "et"
+                },
+                {
+                  "name": "Español (España)",
+                  "value": "es"
+                },
+                {
+                  "name": "Español (Latinoamérica)",
+                  "value": "es-419"
+                },
+                {
+                  "name": "euskara",
+                  "value": "eu"
+                },
+                {
+                  "name": "Filipino",
+                  "value": "fil"
+                },
+                {
+                  "name": "Français (France)",
+                  "value": "fr"
+                },
+                {
+                  "name": "galego",
+                  "value": "gl"
+                },
+                {
+                  "name": "Hrvatski",
+                  "value": "hr"
+                },
+                {
+                  "name": "isiZulu",
+                  "value": "zu"
+                },
+                {
+                  "name": "íslenska",
+                  "value": "is"
+                },
+                {
+                  "name": "Italiano",
+                  "value": "it"
+                },
+                {
+                  "name": "Kiswahili",
+                  "value": "sw"
+                },
+                {
+                  "name": "latviešu",
+                  "value": "lv"
+                },
+                {
+                  "name": "lietuvių",
+                  "value": "lt"
+                },
+                {
+                  "name": "magyar",
+                  "value": "hu"
+                },
+                {
+                  "name": "Nederlands",
+                  "value": "nl"
+                },
+                {
+                  "name": "norsk",
+                  "value": "no"
+                },
+                {
+                  "name": "oʻzbekcha",
+                  "value": "uz"
+                },
+                {
+                  "name": "polski",
+                  "value": "pl"
+                },
+                {
+                  "name": "Português (Brasil)",
+                  "value": "pt-BR"
+                },
+                {
+                  "name": "Português (Portugal)",
+                  "value": "pt-PT"
+                },
+                {
+                  "name": "română",
+                  "value": "ro"
+                },
+                {
+                  "name": "shqip",
+                  "value": "sq"
+                },
+                {
+                  "name": "Slovenčina",
+                  "value": "sk"
+                },
+                {
+                  "name": "slovenščina",
+                  "value": "sl"
+                },
+                {
+                  "name": "Suomi",
+                  "value": "fi"
+                },
+                {
+                  "name": "Svenska",
+                  "value": "sv"
+                },
+                {
+                  "name": "TiếngViệt",
+                  "value": "vi"
+                },
+                {
+                  "name": "Türkçe",
+                  "value": "tr"
+                },
+                {
+                  "name": "Ελληνικά",
+                  "value": "el"
+                },
+                {
+                  "name": "български",
+                  "value": "bg"
+                },
+                {
+                  "name": "кыргызча",
+                  "value": "ky"
+                },
+                {
+                  "name": "қазақтілі",
+                  "value": "kk"
+                },
+                {
+                  "name": "македонски",
+                  "value": "mk"
+                },
+                {
+                  "name": "монгол",
+                  "value": "mn"
+                },
+                {
+                  "name": "Русский",
+                  "value": "ru"
+                },
+                {
+                  "name": "српски (ћирилица)",
+                  "value": "sr"
+                },
+                {
+                  "name": "Українська",
+                  "value": "uk"
+                },
+                {
+                  "name": "ქართული",
+                  "value": "ka"
+                },
+                {
+                  "name": "հայերեն",
+                  "value": "hy"
+                },
+                {
+                  "name": "עברית",
+                  "value": "iw"
+                },
+                {
+                  "name": "اردو",
+                  "value": "ur"
+                },
+                {
+                  "name": "العربية",
+                  "value": "ar"
+                },
+                {
+                  "name": "فارسی",
+                  "value": "fa"
+                },
+                {
+                  "name": "አማርኛ",
+                  "value": "am"
+                },
+                {
+                  "name": "नेपाली",
+                  "value": "ne"
+                },
+                {
+                  "name": "हिन्दी",
+                  "value": "hi"
+                },
+                {
+                  "name": "मराठी",
+                  "value": "mr"
+                },
+                {
+                  "name": "বাংলা",
+                  "value": "bn"
+                },
+                {
+                  "name": "ਪੰਜਾਬੀ",
+                  "value": "pa"
+                },
+                {
+                  "name": "ગુજરાતી",
+                  "value": "gu"
+                },
+                {
+                  "name": "தமிழ்",
+                  "value": "ta"
+                },
+                {
+                  "name": "తెలుగు",
+                  "value": "te"
+                },
+                {
+                  "name": "ಕನ್ನಡ",
+                  "value": "kn"
+                },
+                {
+                  "name": "മലയാളം",
+                  "value": "ml"
+                },
+                {
+                  "name": "සිංහල",
+                  "value": "si"
+                },
+                {
+                  "name": "ไทย",
+                  "value": "th"
+                },
+                {
+                  "name": "ລາວ",
+                  "value": "lo"
+                },
+                {
+                  "name": "ဗမာ",
+                  "value": "my"
+                },
+                {
+                  "name": "ខ្មែរ",
+                  "value": "km"
+                },
+                {
+                  "name": "한국어",
+                  "value": "ko"
+                },
+                {
+                  "name": "日本語",
+                  "value": "ja"
+                },
+                {
+                  "name": "简体中文",
+                  "value": "zh-CN"
+                },
+                {
+                  "name": "繁體中文",
+                  "value": "zh-TW"
+                }
+              ],
+              "defaultValue": "en"
+            },
+            {
+              "id": "reviewsOrigin",
+              "displayName": "Reviews origin",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "options",
+              "removed": true,
+              "options": [
+                {
+                  "name": "All reviews",
+                  "value": "all"
+                },
+                {
+                  "name": "Google",
+                  "value": "google"
+                }
+              ]
+            },
+            {
+              "id": "personalData",
+              "displayName": "Personal data",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "boolean",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "timeout": {},
+        "maxTotalChargeUsd": {}
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 2,
+      "position": [
+        384,
+        -160
+      ],
+      "id": "1620e7ca-da69-410a-b24b-34bdbaa051eb",
+      "name": "Get Google Maps reviews",
+      "alwaysOutputData": true,
+      "credentials": {
+        "apifyApi": {
+          "id": "lDW2LEoaNGfPrZAW",
+          "name": "jphilip dev"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst itemCount = items.filter(item =>\n  Object.keys(item.json).length > 0\n).length;\n\nreturn [\n  {\n    json: {\n      itemCount\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        -160
+      ],
+      "id": "c2702f2d-2f2d-465d-ba78-14b93feb05c1",
+      "name": "Count reviews from Apify"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "1a6a73a6-38dc-4e71-a51f-376001c7962e",
+              "leftValue": "={{ $json.itemCount }}",
+              "rightValue": "={{ $('Count of reviews to Get').item.json.count }}",
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        832,
+        -160
+      ],
+      "id": "29ab98c3-5fdd-44e8-a93d-3677a5edd95b",
+      "name": "New reviews fetched?"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "7ROPW7ZmNN6SYl6o",
+          "mode": "list",
+          "cachedResultName": "apify last date",
+          "cachedResultUrl": "/projects/En3F3NfSHlWOgY0Y/datatables/7ROPW7ZmNN6SYl6o"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "last_date": "={{  $(\"Get Google Maps reviews\").all().first().json.publishedAtDate?? $('Get Apify Last Used Date').item.json.last_date }}"
+          },
+          "matchingColumns": [
+            "last_date"
+          ],
+          "schema": [
+            {
+              "id": "last_date",
+              "displayName": "last_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        -112
+      ],
+      "id": "3e774e6d-3a66-4a39-a793-b5eef3703d6b",
+      "name": "Update the last used date"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "797ca251-150f-4e62-8505-0193b19273ab",
+              "name": "stars",
+              "value": "={{ $json.stars }}",
+              "type": "number"
+            },
+            {
+              "id": "9df0dd49-70de-4b4e-9f62-7d8dced859f1",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "3abceb82-9fd5-4b36-b72d-34fc8358cb1e",
+              "name": "message",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1728,
+        -112
+      ],
+      "id": "3bcac46b-1923-415e-97b6-4768bedc4022",
+      "name": "Prepare Fields"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "14iKCAZYJvo6CRtn",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/14iKCAZYJvo6CRtn",
+          "cachedResultName": "Customer Feedback Processor"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "rating": "={{ String($json.stars) }}",
+            "name": "={{ $json.name }}",
+            "message": "={{ $json.message }}",
+            "source": "google_maps"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "rating",
+              "displayName": "rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.4,
+      "position": [
+        1952,
+        -112
+      ],
+      "id": "420a464f-2b7a-4d62-a857-c643fc817891",
+      "name": "Process Review"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "bcf75161-973f-44c1-8046-b2b88c74ad57",
+              "leftValue": "={{ $json.itemCount }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        1056,
+        -208
+      ],
+      "id": "73233bb5-525f-4ed8-8125-fc6508e7d881",
+      "name": "Nothing new?"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        -304
+      ],
+      "id": "6cd52487-c8ee-4d1d-8343-b0e275e73267",
+      "name": "End"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $(\"Get Google Maps reviews\").all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        -112
+      ],
+      "id": "002ac078-b7a9-46ee-833e-bd9c5d319acf",
+      "name": "Get the reviews from Apify"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Map Place URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Apify Last Used Date": {
+      "main": [
+        [
+          {
+            "node": "Count of reviews to Get",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count of reviews to Get": {
+      "main": [
+        [
+          {
+            "node": "Get Google Maps reviews",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Map Place URL": {
+      "main": [
+        [
+          {
+            "node": "Get Apify Last Used Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increment count of reviews to get": {
+      "main": [
+        [
+          {
+            "node": "Count of reviews to Get",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Google Maps reviews": {
+      "main": [
+        [
+          {
+            "node": "Count reviews from Apify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count reviews from Apify": {
+      "main": [
+        [
+          {
+            "node": "New reviews fetched?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New reviews fetched?": {
+      "main": [
+        [
+          {
+            "node": "Nothing new?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Increment count of reviews to get",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update the last used date": {
+      "main": [
+        [
+          {
+            "node": "Get the reviews from Apify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Fields": {
+      "main": [
+        [
+          {
+            "node": "Process Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nothing new?": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update the last used date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Review": {
+      "main": [
+        []
+      ]
+    },
+    "End": {
+      "main": [
+        []
+      ]
+    },
+    "Get the reviews from Apify": {
+      "main": [
+        [
+          {
+            "node": "Prepare Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0bd38ef6-8535-4a90-8b3a-543a83bd01c0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2946da10cb32e17d3b3d7a3c04192a077fcba729acc5f6701353d5a127ca434e"
+  },
+  "nodeGroups": [],
+  "id": "n0WHWcaPomVyeQdp",
+  "tags": []
+}
